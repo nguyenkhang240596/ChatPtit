@@ -4,12 +4,19 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
 // require('../socketio')(server);
 // var routes = require('./routes/index');
 var user = require('./routes/user');
-
 var app = express();
+
+mongoose.connect('mongodb://127.0.0.1/chatapp');
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('Mongodb connected ');
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
