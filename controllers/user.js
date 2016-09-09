@@ -52,12 +52,11 @@ User.register = function(req, res, next){
 		},
 		createUser : function(callback) {
 			user = new User(req.body);
-			// var password = new Buffer(body.password.toString()).toString('base64');
 			user.password = req.body.password;
 			user.save(function(error) {
 				if (error) callback(error);
 				else callback();
-			});
+			})
 		}
 	}, function (err, results) {
 		if (err) {
