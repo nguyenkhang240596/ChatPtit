@@ -55,11 +55,11 @@ User.register = function(req, res, next){
 			// var password = new Buffer(body.password.toString()).toString('base64');
 			user.password = req.body.password;
 			user.save(function(error) {
-				callback();
-			})
+				if (error) callback(error);
+				else callback();
+			});
 		}
 	}, function (err, results) {
-		console.log(err+results);
 		if (err) {
 			res.json(err);
 		} else {
