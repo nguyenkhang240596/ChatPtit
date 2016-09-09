@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
+var async = require('async');
 
 var UserSchema = require('../models/user');
 var User = mongoose.model('user', UserSchema);
-
 var regexmail = /^[A-z0-9_\.]{4,31}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/;
 var regexpass =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@$!%*?&]{6,}/;
 
@@ -14,6 +14,7 @@ User.register = function(req, res, next){
 	var birthday = req.body.birthday ? req.body.birthday.trim() : '';
 	var gender = req.body.gender ? req.body.gender.trim() : '';
 	var user;
+
 	async.series({
 		checkFields : function (callback) {
 			if (email) {
@@ -36,9 +37,9 @@ User.register = function(req, res, next){
 				return res.json('phone is require');
 			} 
 
-			if (!image) {
-				return res.json('image is require');
-			} 
+			// if (!image) {
+			// 	return res.json('image is require');
+			// } 
 
 			if (!birthday) {
 				return res.json('birthday is require');
@@ -47,17 +48,18 @@ User.register = function(req, res, next){
 			if (!gender) {
 				return res.json('gender is require');
 			} 
+			callback();
 		},
 		createUser : function(callback) {
-			user = new User(body);
+			user = new User(req.body);
 			// var password = new Buffer(body.password.toString()).toString('base64');
-			user.password = body.password;
+			user.password = req.body.password;
 			user.save(function(error) {
-				if (error) return callback('Error');
-					else callback();	
+				callback();
 			})
 		}
 	}, function (err, results) {
+		console.log(err+results);
 		if (err) {
 			res.json(err);
 		} else {
@@ -95,3 +97,5 @@ User.login = function (req, res, next) {
 
 
 }
+
+module.exports = User;
