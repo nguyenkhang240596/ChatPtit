@@ -44,7 +44,7 @@ User.methods ={
 	hashPassword: function(password) {
     	if (!password || !this.salt) return '';
     	var salt = new Buffer(this.salt, 'base64');
-    	return crypto.pbkdf2Sync(password, salt, 100000, 512, 'sha512');
+    	return crypto.pbkdf2Sync(password, salt, 071189, 64).toString('base64');
 	},
 	toJSON: function() {
 		var obj = this.toObject();

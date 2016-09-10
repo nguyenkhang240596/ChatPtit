@@ -19,22 +19,34 @@ User.register = function(req, res, next){
 		checkFields : function (callback) {
 			if (email) {
 				if (!regexmail.test(email)) {
-					return res.json('email is invalid');
+					return callback('email is invalid');
+				} else {
+					User.findOne({
+						email : email
+					}, function (err, user) {
+						if (user) {
+							return callback('email existed')
+						} else if (err) {
+							return callback(err);
+						} else {
+							callback();
+						}
+					});
 				}
 			} else {
-				return res.json('email is require');
+				return callback('email is require');
 			}
 
 			if (password) {
 				if (!regexpass.test(password)) {
-					return res.json('password is invalid');
+					return callback('password is invalid');
 				}
 			} else {
-				return res.json('password is require');
+				return callback('password is require');
 			}
 
 			if (!phone) {
-				return res.json('phone is require');
+				return callback('phone is require');
 			} 
 
 			// if (!image) {
@@ -42,13 +54,13 @@ User.register = function(req, res, next){
 			// } 
 
 			if (!birthday) {
-				return res.json('birthday is require');
+				return callback('birthday is require');
 			}
 
 			if (!gender) {
-				return res.json('gender is require');
+				return callback('gender is require');
 			} 
-			callback();
+
 		},
 		createUser : function(callback) {
 			user = new User(req.body);
@@ -60,9 +72,9 @@ User.register = function(req, res, next){
 		}
 	}, function (err, results) {
 		if (err) {
-			res.json(err);
+			res.json({results:err});
 		} else {
-			res.json(user.toJSON());
+			res.json({results:user.toJSON()});
 		}	
 	});
 }
@@ -71,30 +83,24 @@ User.login = function (req, res, next) {
 	var user;
 	var email = req.body.email ? req.body.email.trim() : '';
 	var password = req.body.password ? req.body.password.trim() : '';	
-	if (!regexmail.test(body[key])){
-		return res.json('email is invalid');
+	if (!regexmail.test(email)){
+		return res.json({results:'email is invalid'});
 	}
-	// else {
-	// 	User.findOne({
-	// 		email : body['email']
-	// 	}, function (err, user) {
-	// 		if (err || !user){
-	// 			res.json(utilities.response(false, {}, 'user not found', 404));
-	// 		} else {
-	// 			if (user.authenticate(body.password.toString())) {
-	// 				var token = jwt.sign(user, config.JWTSecret, { expiresIn: '1d'});
-	// 				cache.set(token, user._id);
-	// 				req.app.id = user._id.toString();
-	// 				var user2 = user.toJSON();
-	// 				res.json(user2);
-	// 			} else {
-	// 				res.json('wrong password');
-	// 			}
-	// 		}
-	// 	});
-	// }
-
-
+	else {
+		User.findOne({
+			email : email
+		}, function (err, user) {
+			if (err || !user){
+				return res.json({results : 'user was not found'});
+			} else {
+				if (user.authenticate(password.toString())) {
+					return res.json({results:user.toJSON()});
+				} else {
+					return res.json({results:'wrong password'});
+				}
+			}
+		});
+	}
 }
 
 module.exports = User;
