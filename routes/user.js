@@ -95,17 +95,7 @@ router.post('/login', function (req, res, next) {
 });
 
 router.get('/:userId', function (req, res, next) {
-	var id = req.params.userId;
-	User.findOne({
-		_id : id
-	}, function (err, user) {
-		if (err || !user){
-			return res.json({results : 'user was not found'});
-		} else {
-			req.user = user;
-			next();
-		}
-	});
+	return res.json({results : req.user});
 });
 
 router.post('/changepwd/:userId', function (req, res, next) {
