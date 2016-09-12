@@ -1,17 +1,20 @@
 var mongoose = require('mongoose');
 var	Schema = mongoose.Schema;
-var crypto = require('crypto');
+var crypto = require('crypto'),
+    algorithm = 'aes-256-ctr';
 
 var User = new Schema({
+	room : {
+		type : Schema.Types.ObjectId,
+		ref : 'Room'
+	},
 	email : {
-		type : String
-		// ,
-		// unique : true
+		type : String,
+		unique : true
 	},
 	phone : String,
-	image : {
-		type : String
-	},
+	avatar : String,
+	background : String,
 	birthday : {
 		type : Date
 	},
@@ -19,6 +22,7 @@ var User = new Schema({
 		type : Boolean,
 		default : false
 	},
+	online : Boolean,
 	hashed_password : String,
 	salt : String
 },{
@@ -38,13 +42,12 @@ User.methods ={
 	authenticate: function(plainText) {
     	return this.hashPassword(plainText) === this.hashed_password;
 	},
-	makeSalt: function() {
-    	return crypto.randomBytes(16).toString('base64');
-	},
 	hashPassword: function(password) {
     	if (!password || !this.salt) return '';
-    	var salt = new Buffer(this.salt, 'base64');
-    	return crypto.pbkdf2Sync(password, salt, 071189, 64).toString('base64');
+    	var cipher = crypto.createCipher(algorithm,password);
+    	var crypted = cipher.update(text,'utf8','hex')
+		crypted += cipher.final('hex');
+		return crypted;
 	},
 	toJSON: function() {
 		var obj = this.toObject();

@@ -13,7 +13,11 @@ var Message = new Schema({
 		type : Schema.Types.ObjectId,
 		ref : 'Room'
 	},
-	content : string,
+	content : String,
+	createdDate : {
+		type : Date,
+		default : Date.now
+	}
 },{
 	versionKey : false
 });

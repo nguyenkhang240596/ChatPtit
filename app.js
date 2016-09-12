@@ -9,6 +9,7 @@ var mongoose = require('mongoose');
 // require('../socketio')(server);
 // var routes = require('./routes/index');
 var user = require('./routes/user');
+var message = require('./routes/message');
 var app = express();
 
 mongoose.connect('mongodb://127.0.0.1/chatapp');
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // app.use('/', routes);
 app.use('/user', user);
+app.use('/message', message);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

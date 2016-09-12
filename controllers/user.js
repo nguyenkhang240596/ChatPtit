@@ -6,7 +6,22 @@ var User = mongoose.model('user', UserSchema);
 var regexmail = /^[A-z0-9_\.]{4,31}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/;
 var regexpass =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@$!%*?&]{6,}/;
 
-User.register = function(req, res, next){
+
+User.User = function (req, res, next) {
+	var id = req.params.userId;
+	User.findOne({
+		_id : id
+	}, function (err, user) {
+		if (err || !user){
+			return res.json({results : 'user was not found'});
+		} else {
+			req.user = user;
+			next();
+		}
+	});
+}
+
+User.Register = function(req, res, next){
 	var email = req.body.email ? req.body.email.trim() : '';
 	var password = req.body.password ? req.body.password.trim() : '';
 	var phone = req.body.phone ? req.body.phone.trim() : '';
@@ -17,8 +32,22 @@ User.register = function(req, res, next){
 
 	async.series({
 		checkFields : function (callback) {
-			if (email) {
-				if (!regexmail.test(email)) {
+			if (!email) {
+				return callback('email is require');
+			} else if (!password) {
+				return callback('password is require');
+			} else if (!phone) {
+				return callback('phone is require'); 
+			// } else if (!image) {
+			// 	return callback('image is require');
+			} else if (!birthday) {
+				return callback('birthday is require');
+			} else if (!gender) {
+				return callback('gender is require');
+			} else {
+				if (!regexpass.test(password)) {
+					return callback('password is invalid');
+				} else if (!regexmail.test(email)) {
 					return callback('email is invalid');
 				} else {
 					User.findOne({
@@ -33,34 +62,7 @@ User.register = function(req, res, next){
 						}
 					});
 				}
-			} else {
-				return callback('email is require');
 			}
-
-			if (password) {
-				if (!regexpass.test(password)) {
-					return callback('password is invalid');
-				}
-			} else {
-				return callback('password is require');
-			}
-
-			if (!phone) {
-				return callback('phone is require');
-			} 
-
-			// if (!image) {
-			// 	return res.json('image is require');
-			// } 
-
-			if (!birthday) {
-				return callback('birthday is require');
-			}
-
-			if (!gender) {
-				return callback('gender is require');
-			} 
-
 		},
 		createUser : function(callback) {
 			user = new User(req.body);
@@ -79,7 +81,11 @@ User.register = function(req, res, next){
 	});
 }
 
-User.login = function (req, res, next) {
+User.Get = function (req, res, next) {
+	res.json(req.user.toJSON());
+}
+
+User.Login = function (req, res, next) {
 	var user;
 	var email = req.body.email ? req.body.email.trim() : '';
 	var password = req.body.password ? req.body.password.trim() : '';	
@@ -100,6 +106,63 @@ User.login = function (req, res, next) {
 				}
 			}
 		});
+	}
+}
+
+User.ChangePwd = function (req, res, next) {
+	var user = req.user;
+	var oldPassword = req.body.oldPassword ? req.body.oldPassword : '';
+	var newPassword = req.body.newPassword ? req.body.newPassword : '';	
+	var repeatPassword = req.body.repeatPassword ? req.body.repeatPassword : '';	
+	if (!oldPassword) {
+			return res.json('oldPassword is require');
+	} else if (!newPassword) {
+		return res.json('newPassword is require');
+	} else if (!repeatPassword) {
+		return res.json('repeatPassword is require'); 
+	} else {
+		if (user.authenticate(oldPassword)) {
+			if (newPassword === repeatPassword) {
+				user.password = newPassword;
+				res.json({results:user.toJSON()});
+			} else {
+				res.json({results:'Repeat password is not match'});
+			}
+		} else {
+			res.json({results:'Your old password is not correct'});
+		}
+	}
+}
+
+User.ChangeAvatar = function (req, res, next) {
+	var user = req.user;
+	var avatar = req.body.avatar ? req.body.avatar : '';
+	if (!avatar) {
+			res.json('avatar is require');
+	} else {
+		user.avatar = avatar;
+		user.save(function(err) {
+			if (err) {
+				res.json('avatar is require');
+			} else {
+				res.json({results:user.toJSON()});
+			}
+		})
+	}
+}
+
+User.ChangeBackground = function (req, res, next) {
+	var user = req.user;
+	var background = req.body.background ? req.body.background : '';
+	if (!background) {
+			res.json('background is require');
+	} else {
+		// user.background = background;
+		// user.save(function(err) {
+		// 	if (err) {
+		// 		res.json('avatar is require');
+		// 	}
+		// })
 	}
 }
 
