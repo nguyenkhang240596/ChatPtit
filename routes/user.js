@@ -146,12 +146,12 @@ router.post('/changebackground/:userId', function (req, res, next) {
 	if (!background) {
 			res.json('background is require');
 	} else {
-		// user.background = background;
-		// user.save(function(err) {
-		// 	if (err) {
-		// 		res.json('avatar is require');
-		// 	}
-		// })
+		user.background = background;
+		user.save(function(err) {
+			if (err) {
+				res.json('background is require');
+			}
+		})
 	}
 });
 
