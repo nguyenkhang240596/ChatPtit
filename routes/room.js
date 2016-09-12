@@ -4,44 +4,35 @@ var async = require('async');
 
 var mongoose = require('mongoose');
 var RoomSchema = require('../models/room');
-var Room = mongoose.model('room', RoomSchema);
+var Room = mongoose.model('Room', RoomSchema);
+
+var UserSchema = require('../models/user');
+var User = mongoose.model('User', UserSchema);
 
 // var RoomCtrl = require('../controllers/room');
 
 router.get('/:roomId', function(req, res, next) {
-	var id = req.params.messageId ? req.params.messageId.trim().toString() : '';
-	if (!id) {
-		return res.json({results:'Please add messageId'});
-	} else {
-		Message.findOne({_id : id}, function(err, data) {
-			if (err || !data) {
-				res.json({results:'Message was not found'});
-			}
-			else {
-				res.json({results:data});
-			}
-		});
-	}
+	res.json({results:req.room});
 });
 
 router.post('/', function(req, res, next) {
 	var owner = req.body.owner ? req.body.owner.trim() : '';
-	var room = req.body.room ? req.body.room.trim() : '';
-	var content = req.body.content ? req.body.content.trim() : '';
-	var message;
+	var members = req.body.members ? req.body.members.trim() : '';
+	var message = req.body.message ? req.body.message.trim() : '';
+	var room;
 	async.series({
 		checkFields : function (callback) {
 			if (!owner) {
 				return callback('owner is require');
-			} else if (!room) {
-				return callback('room is require');
-			} else if (!content) {
-				return callback('content is require');
+			} else if (!members) {
+				return callback('members is require');
+			} else if (!message) {
+				return callback('message is require');
 			} else callback();
 		},
 		createMessage : function(callback) {
-			message = new Message(req.body);
-			message.save(function(err, data) {
+			room = new Room(req.body);
+			room.save(function(err, data) {
 				if (err || !data) {
 					callback({results:err});
 				}else {
@@ -53,12 +44,40 @@ router.post('/', function(req, res, next) {
 		if (err) {
 			res.json({results:err});
 		} else {
-			res.json({results:message});
+			res.json({results:room});
 		}	
 	});
 	
 });
 
-router.get('/getUsersInRoom/:roomId', UserCtrl.GetUsersInRoom);
+router.get('/getUsersInRoom/:roomId', function(req, res, next) {
+	var room = req.room;
+	console.log(room);
+	console.log(req.params.roomId);
+	User.find({
+		room : room._id
+	}, function (err, users) {
+		if (err || !users){
+			return res.json({results : ''});
+		} else {
+			return res.json({results : users});
+		}
+	});
+	
+});
+
+router.param('roomId', function (req, res, next) {
+	var id = req.params.roomId;
+	Room.findOne({
+		_id : id
+	}, function (err, room) {
+		if (err || !room){
+			return res.json({results : 'Room was not found'});
+		} else {
+			req.room = room;
+			next();
+		}
+	});
+});
 
 module.exports = router;

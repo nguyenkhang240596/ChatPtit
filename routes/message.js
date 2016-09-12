@@ -4,7 +4,7 @@ var async = require('async');
 
 var mongoose = require('mongoose');
 var MessageSchema = require('../models/message');
-var Message = mongoose.model('message', MessageSchema);
+var Message = mongoose.model('Message', MessageSchema);
 
 router.get('/:messageId', function(req, res, next) {
 	var id = req.params.messageId ? req.params.messageId.trim().toString() : '';

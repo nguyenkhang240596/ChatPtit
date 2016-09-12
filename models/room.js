@@ -3,6 +3,7 @@ var	Schema = mongoose.Schema;
 var crypto = require('crypto');
 
 var Room = new Schema({
+	name : String,
 	owner : {
 		type : Schema.Types.ObjectId,
 		ref : 'User'

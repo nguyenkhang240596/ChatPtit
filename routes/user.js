@@ -4,7 +4,7 @@ var async = require('async');
 
 var mongoose = require('mongoose');
 var UserSchema = require('../models/user');
-var User = mongoose.model('user', UserSchema);
+var User = mongoose.model('User', UserSchema);
 var regexmail = /^[A-z0-9_\.]{4,31}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/;
 var regexpass =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@$!%*?&]{6,}/;
 
