@@ -51,7 +51,7 @@ router.post('/', function(req, res, next) {
 		if (err) {
 			res.json({results:err});
 		} else {
-			res.json({results:message.toJSON()});
+			res.json({results:message});
 		}	
 	});
 	

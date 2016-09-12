@@ -65,7 +65,7 @@ router.post('/register', function(req, res, next){
 		if (err) {
 			res.json({results:err});
 		} else {
-			res.json({results:user.toJSON()});
+			res.json({results:user});
 		}	
 	});
 });
@@ -85,7 +85,7 @@ router.post('/login', function (req, res, next) {
 				return res.json({results : 'user was not found'});
 			} else {
 				if (user.authenticate(password.toString())) {
-					return res.json({results:user.toJSON()});
+					return res.json({results:user});
 				} else {
 					return res.json({results:'wrong password'});
 				}
@@ -113,7 +113,7 @@ router.post('/changepwd/:userId', function (req, res, next) {
 		if (user.authenticate(oldPassword)) {
 			if (newPassword === repeatPassword) {
 				user.password = newPassword;
-				res.json({results:user.toJSON()});
+				res.json({results:user});
 			} else {
 				res.json({results:'Repeat password is not match'});
 			}
@@ -134,7 +134,7 @@ router.post('/changeavatar/:userId', function (req, res, next) {
 			if (err) {
 				res.json('avatar is require');
 			} else {
-				res.json({results:user.toJSON()});
+				res.json({results:user});
 			}
 		})
 	}
@@ -150,6 +150,8 @@ router.post('/changebackground/:userId', function (req, res, next) {
 		user.save(function(err) {
 			if (err) {
 				res.json('background is require');
+			} else {
+				res.json({results:user});
 			}
 		})
 	}
