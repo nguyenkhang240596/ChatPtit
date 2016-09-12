@@ -32,7 +32,6 @@ var User = new Schema({
 
 User.virtual('password').set(function(password) {
   	this._password = password;
-  	this.salt = this.makeSalt();
   	this.hashed_password = this.hashPassword(password);
 }).get(function() {
   return this._password;
@@ -43,9 +42,8 @@ User.methods ={
     	return this.hashPassword(plainText) === this.hashed_password;
 	},
 	hashPassword: function(password) {
-    	if (!password || !this.salt) return '';
     	var cipher = crypto.createCipher(algorithm,password);
-    	var crypted = cipher.update(text,'utf8','hex')
+    	var crypted = cipher.update('Secret','utf8','hex')
 		crypted += cipher.final('hex');
 		return crypted;
 	},
