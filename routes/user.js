@@ -66,9 +66,9 @@ router.post('/register', function(req, res, next){
 		}
 	}, function (err, results) {
 		if (err) {
-			res.json({results:err});
+			res.json({statuscode : 404,results:err});
 		} else {
-			res.json({results:user});
+			res.json({statuscode : 200,results:user});
 		}	
 	});
 });
@@ -78,19 +78,19 @@ router.post('/login', function (req, res, next) {
 	var email = req.body.email ? req.body.email.trim() : '';
 	var password = req.body.password ? req.body.password.trim() : '';	
 	if (!regexmail.test(email)){
-		return res.json({results:'email is invalid'});
+		return res.json({statuscode : 404,results:'email is invalid'});
 	}
 	else {
 		User.findOne({
 			email : email
 		}, function (err, user) {
 			if (err || !user){
-				return res.json({results : 'user was not found'});
+				return res.json({statuscode : 404,results : 'user was not found'});
 			} else {
 				if (user.authenticate(password.toString())) {
-					return res.json({results:user});
+					return res.json({statuscode : 200,results:user});
 				} else {
-					return res.json({results:'wrong password'});
+					return res.json({statuscode : 404,results:'wrong password'});
 				}
 			}
 		});
@@ -98,7 +98,7 @@ router.post('/login', function (req, res, next) {
 });
 
 router.get('/:userEmail', function (req, res, next) {
-	return res.json({results : req.user});
+	return res.json({statuscode : 200,results : req.user});
 });
 
 router.post('/changepwd/:userEmail', function (req, res, next) {
@@ -116,12 +116,12 @@ router.post('/changepwd/:userEmail', function (req, res, next) {
 		if (user.authenticate(oldPassword)) {
 			if (newPassword === repeatPassword) {
 				user.password = newPassword;
-				res.json({results:user});
+				res.json({statuscode : 200,results:user});
 			} else {
-				res.json({results:'Repeat password is not match'});
+				res.json({statuscode : 404,results:'Repeat password is not match'});
 			}
 		} else {
-			res.json({results:'Your old password is not correct'});
+			res.json({statuscode : 404,results:'Your old password is not correct'});
 		}
 	}
 });
@@ -130,14 +130,14 @@ router.post('/changeavatar/:userEmail', function (req, res, next) {
 	var user = req.user;
 	var avatar = req.body.avatar ? req.body.avatar : '';
 	if (!avatar) {
-			res.json('avatar is require');
+			res.json({statuscode : 404,results:'avatar is require'});
 	} else {
 		user.avatar = avatar;
 		user.save(function(err) {
 			if (err) {
-				res.json('avatar is require');
+				res.json({statuscode : 404,results:'avatar is require'});
 			} else {
-				res.json({results:user});
+				res.json({statuscode : 200,results:user});
 			}
 		})
 	}
@@ -147,14 +147,14 @@ router.post('/changebackground/:userEmail', function (req, res, next) {
 	var user = req.user;
 	var background = req.body.background ? req.body.background : '';
 	if (!background) {
-			res.json('background is require');
+			res.json({statuscode : 404,results:'background is require'});
 	} else {
 		user.background = background;
 		user.save(function(err) {
 			if (err) {
-				res.json('background is require');
+				res.json({statuscode : 404,results:'background is require'});
 			} else {
-				res.json({results:user});
+				res.json({statuscode : 200,results:user});
 			}
 		})
 	}
@@ -165,7 +165,7 @@ router.param('userEmail', function (req, res, next) {
 		email : req.params.userEmail
 	}, function (err, user) {
 		if (err || !user){
-			return res.json({results : 'user was not found'});
+			return res.json({statuscode : 404,results : 'user was not found'});
 		} else {
 			req.user = user;
 			next();

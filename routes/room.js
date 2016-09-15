@@ -16,13 +16,15 @@ var User = mongoose.model('User', UserSchema);
 // var RoomCtrl = require('../controllers/room');
 
 router.get('/:roomId', function(req, res, next) {
-	res.json({results:req.room});
+	res.json({statuscode : 200,results:req.room});
 });
 
 router.post('/', function(req, res, next) {
 	var owner = req.body.owner ? req.body.owner.trim() : '';
 	var members = req.body.members ? req.body.members : [];
 	var message = req.body.message ? req.body.message.trim() : '';
+	console.log(members.length);
+
 	var room;
 	async.series({
 		checkFields : function (callback) {
@@ -37,17 +39,21 @@ router.post('/', function(req, res, next) {
 		checkUser : function (callback) {
 			User.findOne({ _id : owner }, function(err, user) {
 				if (err || !user){
-					return res.json({results : 'User were not found', status : 404});
+					return res.json({statuscode : 404,results : 'User were not found'});
 				} else {
 					callback();
 				}	
 			});
 		},
 		checkMembers : function (callback) {
-			async.mapSeries(members, function(u, cb) {
-				User.findOne({ _id : u}, function(err, user) {
+			if (!Array.isArray(members)) {
+				members = [];
+				members.push(req.body.members);
+			}
+			async.mapSeries(members, function(userM, cb) {
+				User.findOne({ _id : userM}, function(err, user) {
 					if (err || !user){
-						return res.json({results : 'User were not found', status : 404});
+						return res.json({statuscode : 404,results : userM + 'Members were not found'});
 					} else {
 						cb();
 					}	
@@ -63,7 +69,7 @@ router.post('/', function(req, res, next) {
 		checkMessage : function (callback) {
 			Message.findOne({ _id : message}, function(err, user) {
 				if (err || !user){
-					return res.json({results : 'Message were not found', status : 404});
+					return res.json({statuscode : 404,results : 'Message were not found'});
 				} else {
 					callback();
 				}	
@@ -72,7 +78,7 @@ router.post('/', function(req, res, next) {
 		checkUniqRoom : function (callback) {
 			Room.findOne({ owner : owner}, function(err, room) {
 				if (err || room){
-					return res.json({results : 'User can only create one room', status : 404});
+					return res.json({statuscode : 404,results : 'User can only create one room'});
 				} else {
 					callback();
 				}	
@@ -82,7 +88,7 @@ router.post('/', function(req, res, next) {
 			room = new Room(req.body);
 			room.save(function(err, data) {
 				if (err || !data) {
-					callback({results:err});
+					callback({statuscode : 404,results:err});
 				}else {
 					callback();
 				}
@@ -90,9 +96,9 @@ router.post('/', function(req, res, next) {
 		}
 	}, function (err, results) {
 		if (err) {
-			res.json({results:err});
+			res.json({statuscode : 404,results:err});
 		} else {
-			res.json({results:room});
+			res.json({statuscode : 200,results:room});
 		}	
 	});
 	
@@ -106,9 +112,9 @@ router.get('/getUsersInRoom/:roomId', function(req, res, next) {
 		room : room._id
 	}, function (err, users) {
 		if (err || !users){
-			return res.json({results : ''});
+			return res.json({statuscode : 404,results : ''});
 		} else {
-			return res.json({results : users});
+			return res.json({statuscode : 200,results : users});
 		}
 	});
 	
@@ -117,9 +123,9 @@ router.get('/getUsersInRoom/:roomId', function(req, res, next) {
 router.get('/', function(req, res, next) {
 	Room.find({}, function (err, rooms) {
 		if (err || !rooms){
-			return res.json({results : 'Total room is zero'});
+			return res.json({statuscode : 404,results : 'Total room is zero'});
 		} else {
-			return res.json({results : rooms});
+			return res.json({statuscode : 200,results : rooms});
 		}
 	});
 });
@@ -131,7 +137,7 @@ router.param('roomId', function (req, res, next) {
 		_id : id
 	}, function (err, room) {
 		if (err || !room){
-			return res.json({results : 'Room was not found'});
+			return res.json({statuscode : 404,results : 'Room was not found'});
 		} else {
 			req.room = room;
 			next();

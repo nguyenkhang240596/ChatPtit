@@ -9,17 +9,30 @@ var Message = mongoose.model('Message', MessageSchema);
 router.get('/:messageId', function(req, res, next) {
 	var id = req.params.messageId ? req.params.messageId.trim().toString() : '';
 	if (!id) {
-		return res.json({results:'Please add messageId'});
+		return res.json({statuscode : 404,results:'Please add messageId'});
 	} else {
 		Message.findOne({_id : id}, function(err, data) {
 			if (err || !data) {
-				res.json({results:'Message was not found'});
+				res.json({statuscode : 404,results:'Message was not found'});
 			}
 			else {
-				res.json({results:data});
+				res.json({statuscode : 200,results:data});
 			}
 		});
 	}
+});
+
+router.get('/recenlty/:roomId', function(req, res, next) {
+	Message.find({ room : roomId })
+		.sort('-date')
+		.limit(4)
+		.exec(function(err, messages){
+			if (err || !messages) {
+				res.json({statuscode : 404,results:'Dont have any message in room'});
+			} else {
+				res.json({statuscode : 200,results:messages});
+			}
+		})
 });
 
 router.post('/', function(req, res, next) {
@@ -49,9 +62,9 @@ router.post('/', function(req, res, next) {
 		}
 	}, function (err, results) {
 		if (err) {
-			res.json({results:err});
+			res.json({statuscode : 404,results:err});
 		} else {
-			res.json({results:message});
+			res.json({statuscode : 200,results:message});
 		}	
 	});
 	
