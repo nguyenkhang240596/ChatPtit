@@ -17,6 +17,7 @@ router.post('/register', function(req, res, next){
 	var image = req.body.image ? req.body.image.trim() : '';
 	var birthday = req.body.birthday ? req.body.birthday.trim() : '';
 	var gender = req.body.gender ? req.body.gender.trim() : '';
+	var name = req.body.name ? req.body.name.trim() : '';
 	var user;
 
 	async.series({
@@ -27,8 +28,10 @@ router.post('/register', function(req, res, next){
 				return callback('password is require');
 			} else if (!phone) {
 				return callback('phone is require'); 
-			// } else if (!image) {
-			// 	return callback('image is require');
+			} else if (!image) {
+				return callback('image is require');
+			} else if (!name) {
+				return callback('name is require');
 			} else if (!birthday) {
 				return callback('birthday is require');
 			} else if (!gender) {
@@ -94,11 +97,11 @@ router.post('/login', function (req, res, next) {
 	}
 });
 
-router.get('/:userId', function (req, res, next) {
+router.get('/:userEmail', function (req, res, next) {
 	return res.json({results : req.user});
 });
 
-router.post('/changepwd/:userId', function (req, res, next) {
+router.post('/changepwd/:userEmail', function (req, res, next) {
 	var user = req.user;
 	var oldPassword = req.body.oldPassword ? req.body.oldPassword : '';
 	var newPassword = req.body.newPassword ? req.body.newPassword : '';	
@@ -123,7 +126,7 @@ router.post('/changepwd/:userId', function (req, res, next) {
 	}
 });
 
-router.post('/changeavatar/:userId', function (req, res, next) {
+router.post('/changeavatar/:userEmail', function (req, res, next) {
 	var user = req.user;
 	var avatar = req.body.avatar ? req.body.avatar : '';
 	if (!avatar) {
@@ -140,7 +143,7 @@ router.post('/changeavatar/:userId', function (req, res, next) {
 	}
 });
 
-router.post('/changebackground/:userId', function (req, res, next) {
+router.post('/changebackground/:userEmail', function (req, res, next) {
 	var user = req.user;
 	var background = req.body.background ? req.body.background : '';
 	if (!background) {
@@ -157,10 +160,9 @@ router.post('/changebackground/:userId', function (req, res, next) {
 	}
 });
 
-router.param('userId', function (req, res, next) {
-	var id = req.params.userId;
+router.param('userEmail', function (req, res, next) {
 	User.findOne({
-		_id : id
+		email : req.params.userEmail
 	}, function (err, user) {
 		if (err || !user){
 			return res.json({results : 'user was not found'});

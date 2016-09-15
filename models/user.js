@@ -8,6 +8,7 @@ var User = new Schema({
 		type : Schema.Types.ObjectId,
 		ref : 'Room'
 	},
+	name : String,
 	email : {
 		type : String,
 		unique : true
