@@ -21,55 +21,23 @@ router.get('/:roomId', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
 	var owner = req.body.owner ? req.body.owner.trim() : '';
-	var members = req.body.members ? req.body.members : [];
-	var message = req.body.message ? req.body.message.trim() : '';
-	console.log(members.length);
-
+	var name = req.body.name ? req.body.name : [];
+	var slogan = req.body.slogan ? req.body.slogan : [];
 	var room;
 	async.series({
 		checkFields : function (callback) {
 			if (!owner) {
 				return callback('owner is require');
-			} else if (!members) {
-				return callback('members is require');
-			} else if (!message) {
-				return callback('message is require');
+			} else if (!name) {
+				return callback('name is require');
+			} else if (!slogan) {
+				return callback('slogan is require');
 			} else callback();
 		},
 		checkUser : function (callback) {
 			User.findOne({ _id : owner }, function(err, user) {
 				if (err || !user){
 					return res.json({statuscode : 404,results : 'User were not found'});
-				} else {
-					callback();
-				}	
-			});
-		},
-		checkMembers : function (callback) {
-			if (!Array.isArray(members)) {
-				members = [];
-				members.push(req.body.members);
-			}
-			async.mapSeries(members, function(userM, cb) {
-				User.findOne({ _id : userM}, function(err, user) {
-					if (err || !user){
-						return res.json({statuscode : 404,results : userM + 'Members were not found'});
-					} else {
-						cb();
-					}	
-				});
-			}, function(err) {
-				if (err) {
-					callback(err);
-				} else {
-					callback();
-				}
-			})
-		},
-		checkMessage : function (callback) {
-			Message.findOne({ _id : message}, function(err, user) {
-				if (err || !user){
-					return res.json({statuscode : 404,results : 'Message were not found'});
 				} else {
 					callback();
 				}	
@@ -84,12 +52,55 @@ router.post('/', function(req, res, next) {
 				}	
 			});
 		},
-		createMessage : function(callback) {
+		createObject : function(callback) {
 			room = new Room(req.body);
 			room.save(function(err, data) {
 				if (err || !data) {
 					callback({statuscode : 404,results:err});
 				}else {
+					callback();
+				}
+			});
+		}
+	}, function (err, results) {
+		if (err) {
+			res.json({statuscode : 404,results:err});
+		} else {
+			res.json({statuscode : 200,results:room});
+		}	
+	});
+	
+});
+
+router.post('/addUser/:roomId', function(req, res, next) {
+	var roomId = req.params.roomId;
+	var userId = req.body.userId;
+	var room;
+	async.series({
+		checkFields : function (callback) {
+			if (!userId) {
+				return callback('userId is require');
+			} else callback();
+		},
+		checkUser : function (callback) {
+			User.findOne({ _id : userId }, function(err, user) {
+				if (err || !user){
+					return res.json({statuscode : 404,results : 'User were not found'});
+				} else {
+					callback();
+				}	
+			});
+		},
+		addUserToRoom : function(callback) {
+			Room.findOne({
+				_id : roomId
+			}, function (err, rooom) {
+				if (err || !rooom){
+					return res.json({statuscode : 404,results : 'Room were not found'});
+				} else {
+					room = rooom;
+					room.members.push(userId);
+					room.save();
 					callback();
 				}
 			});

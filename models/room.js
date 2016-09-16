@@ -9,6 +9,7 @@ var Room = new Schema({
 		ref : 'User',
 		unique : true
 	},
+	slogan : String,
 	members : [{
 		type : Schema.Types.ObjectId,
 		ref : 'User'
