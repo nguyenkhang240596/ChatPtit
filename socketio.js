@@ -68,6 +68,7 @@ function connectIO(server) {
 							io.to(roomId).emit("server-send-message",
 								{ statuscode : 404 , results : 'Room were not found'});
 						} else {
+							room.message.push(mes._id);
 							io.to(roomId).emit("server-send-message",
 								{ statuscode : 200 , results : mes});
 						}
