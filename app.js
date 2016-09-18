@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 // require('../socketio')(server);
-// var routes = require('./routes/index');
+
 var user = require('./routes/user');
 var message = require('./routes/message');
 var room = require('./routes/room');
@@ -32,7 +32,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', routes);
 app.use('/user', user);
 app.use('/message', message);
 app.use('/room', room);

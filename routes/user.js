@@ -115,8 +115,18 @@ router.post('/changepwd/:userEmail', function (req, res, next) {
 	} else {
 		if (user.authenticate(oldPassword)) {
 			if (newPassword === repeatPassword) {
-				user.password = newPassword;
-				res.json({statuscode : 200,results:user});
+				if (regexpass.test(newPassword)) {
+					user.password = newPassword;
+					user.save(function(err) {
+						if (err) {
+							res.json({statuscode : 404,results:err.message});
+						} else {
+							res.json({statuscode : 200,results:user});
+						}
+					});
+				} else {
+					res.json({statuscode : 404,results:'Repeat password is invalid'});
+				}
 			} else {
 				res.json({statuscode : 404,results:'Repeat password is not match'});
 			}
