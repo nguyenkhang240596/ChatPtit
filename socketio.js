@@ -18,6 +18,9 @@ var User = mongoose.model('User', UserSchema);
 io.sockets.on('connection',function (socket)
 {
 	console.log('new connnection');
+	socket.on('test', function(message) {
+		socket.emit('test', message);
+	});
 	socket.on('client-send-message',function (roomId, email, content, image)
 	{
 		Room.findOne({ _id : roomId }, function(err, room) {
