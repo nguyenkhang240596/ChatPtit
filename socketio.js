@@ -6,14 +6,14 @@ var async = require('async');
 
 var mongoose = require('mongoose');
 
-var RoomSchema = require('../models/room');
+var RoomSchema = require('./models/room');
 var Room = mongoose.model('Room', RoomSchema);
 
-var MessageSchema = require('../models/message');
+var MessageSchema = require('./models/message');
 var Message = mongoose.model('Message', MessageSchema);
 
+var UserSchema = require('./models/user');
 var User = mongoose.model('User', UserSchema);
-var UserSchema = require('../models/user');
 
 io.sockets.on('connection',function (socket)
 {

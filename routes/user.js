@@ -135,7 +135,7 @@ router.post('/changepwd/:userEmail', function (req, res, next) {
 		}
 	}
 });
-
+	
 router.post('/changeavatar/:userEmail', function (req, res, next) {
 	var user = req.user;
 	var avatar = req.body.avatar ? req.body.avatar : '';
@@ -178,8 +178,6 @@ router.param('userEmail', function (req, res, next) {
 			return res.json({statuscode : 404,results : 'user was not found'});
 		} else {
 			req.user = user;
-			var date = req.user.birthday;
-			console.log(date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear());
 			next();
 		}
 	});

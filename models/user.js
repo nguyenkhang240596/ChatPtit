@@ -16,9 +16,7 @@ var User = new Schema({
 	phone : String,
 	avatar : String,
 	background : String,
-	birthday : {
-		type : Date
-	},
+	birthday : String,
 	gender : {
 		type : Boolean,
 		default : false
