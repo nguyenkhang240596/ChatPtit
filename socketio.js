@@ -20,6 +20,7 @@ function connectIO(server) {
 	var io = require('socket.io')(server);
 	io.sockets.on('connection',function (socket)
 	{
+		console.log('new connection');
 		socket.on('client-join-room',function (userId, roomId)
 		{
 			Room.findOne({ _id : roomId }, function(err, room) {
@@ -40,6 +41,7 @@ function connectIO(server) {
 								} else {
 									socket.join(roomId);
 									user.room = roomId;
+									user.save();
 									socket.emit("server-join-room", 
 									{ statuscode : 200 , results : 'Join room successfully'});
 								}
@@ -63,16 +65,50 @@ function connectIO(server) {
 					mes.image = image;
 					mes.save(function(err) {
 						if (err) {
-							io.to(roomTitle).emit("server-send-message",
+							io.to(roomId).emit("server-send-message",
 								{ statuscode : 404 , results : 'Room were not found'});
 						} else {
-							io.to(roomTitle).emit("server-send-message",
+							io.to(roomId).emit("server-send-message",
 								{ statuscode : 200 , results : mes});
 						}
 					});
 				}
 			});
 		});
+
+		socket.on('client-leave-room',function (userId, roomId)
+		{
+			Room.findOne({ _id : roomId }, function(err, room) {
+				if (err || !room) {
+					socket.emit("server-leave-room", 
+						{ statuscode : 404 , results : 'Room were not found'});
+				} else {
+					User.findOne({ _id : userId, room : roomId }, function(err, user) {
+						if (err || !user){
+							socket.emit("server-leave-room", 
+							{ statuscode : 404 , results : 'User were not found'});
+						} else {
+							room.members.remove(room.members.indexOf(userId));
+							room.save(function(err) {
+								if (err) {
+									socket.emit("server-leave-room", 
+									{ statuscode : 404 , results : 'Error 404'});
+								} else {
+									socket.leave(roomId);
+									user.room = '';
+									user.save();
+									socket.emit("server-leave-room", 
+									{ statuscode : 200 , results : 'Leave room successfully'});
+								}
+							});
+						}	
+					});
+				}
+			});
+		});
+
+
+
 	});
 }
 
