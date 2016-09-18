@@ -22,7 +22,6 @@ router.get('/:roomId', function(req, res, next) {
 router.post('/', function(req, res, next) {
 	var owner = req.body.owner ? req.body.owner.trim() : '';
 	var name = req.body.name ? req.body.name : [];
-	var slogan = req.body.slogan ? req.body.slogan : [];
 	var room;
 	async.series({
 		checkFields : function (callback) {
@@ -30,8 +29,6 @@ router.post('/', function(req, res, next) {
 				return callback('owner is require');
 			} else if (!name) {
 				return callback('name is require');
-			} else if (!slogan) {
-				return callback('slogan is require');
 			} else callback();
 		},
 		checkUser : function (callback) {

@@ -3,17 +3,9 @@ var	Schema = mongoose.Schema;
 var crypto = require('crypto');
 
 var Message = new Schema({
-	owner : {
-		type : Schema.Types.ObjectId,
-		ref : 'User'
-		// ,
-		// unique : true
-	},
-	room : {
-		type : Schema.Types.ObjectId,
-		ref : 'Room'
-	},
+	owner : String,	
 	content : String,
+	image : String,
 	createdDate : {
 		type : Date,
 		default : Date.now
@@ -21,6 +13,5 @@ var Message = new Schema({
 },{
 	versionKey : false
 });
-
 
 module.exports = Message;
