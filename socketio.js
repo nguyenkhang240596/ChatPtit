@@ -20,7 +20,7 @@ function connectIO(server) {
 	var io = require('socket.io')(server);
 	io.sockets.on('connection',function (socket)
 	{
-		socket.emit('test', message);
+		socket.emit('test', 'test');
 		socket.on('test', function(message) {
 			console.log(message);
 			socket.emit('test', message);
