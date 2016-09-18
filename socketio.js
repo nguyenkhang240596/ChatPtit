@@ -20,11 +20,36 @@ function connectIO(server) {
 	var io = require('socket.io')(server);
 	io.sockets.on('connection',function (socket)
 	{
-		// socket.emit('test', 'test');
-		socket.on('test', function(message) {
-			console.log(message);
-			socket.emit('test', message);
+		console.log('new connection');
+		socket.on('client-join-room',function (userId, roomId)
+		{
+			Room.findOne({ _id : roomId }, function(err, room) {
+				if (err || !room) {
+					socket.emit("server-join-message", 
+						{ statuscode : 404 , results : 'Room were not found'});
+				} else {
+					User.findOne({ _id : userId }, function(err, user) {
+						if (err || !user){
+							socket.emit("server-join-message", 
+							{ statuscode : 404 , results : 'User were not found'});
+						} else {
+							room.members.push(userId);
+							room.save(function(err) {
+								if (err) {
+									socket.emit("server-join-message", 
+									{ statuscode : 404 , results : 'User were not found'});
+								} else {
+									socket.join(roomId);
+									socket.emit("server-join-message", 
+									{ statuscode : 200 , results : 'Join room successfully'});
+								}
+							});
+						}	
+					});
+				}
+			});
 		});
+
 		socket.on('client-send-message',function (roomId, email, content, image)
 		{
 			Room.findOne({ _id : roomId }, function(err, room) {

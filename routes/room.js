@@ -69,49 +69,6 @@ router.post('/', function(req, res, next) {
 	
 });
 
-router.post('/addUser/:roomId', function(req, res, next) {
-	var roomId = req.params.roomId;
-	var userId = req.body.userId;
-	var room;
-	async.series({
-		checkFields : function (callback) {
-			if (!userId) {
-				return callback('userId is require');
-			} else callback();
-		},
-		checkUser : function (callback) {
-			User.findOne({ _id : userId }, function(err, user) {
-				if (err || !user){
-					return res.json({statuscode : 404,results : 'User were not found'});
-				} else {
-					callback();
-				}	
-			});
-		},
-		addUserToRoom : function(callback) {
-			Room.findOne({
-				_id : roomId
-			}, function (err, rooom) {
-				if (err || !rooom){
-					return res.json({statuscode : 404,results : 'Room were not found'});
-				} else {
-					room = rooom;
-					room.members.push(userId);
-					room.save();
-					callback();
-				}
-			});
-		}
-	}, function (err, results) {
-		if (err) {
-			res.json({statuscode : 404,results:err});
-		} else {
-			res.json({statuscode : 200,results:room});
-		}	
-	});
-	
-});
-
 router.get('/getUsersInRoom/:roomId', function(req, res, next) {
 	var room = req.room;
 	console.log(room);
