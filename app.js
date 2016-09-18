@@ -5,8 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-require('./socketio');
-
 var user = require('./routes/user');
 var message = require('./routes/message');
 var room = require('./routes/room');
