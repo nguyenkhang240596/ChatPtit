@@ -178,6 +178,8 @@ router.param('userEmail', function (req, res, next) {
 			return res.json({statuscode : 404,results : 'user was not found'});
 		} else {
 			req.user = user;
+			var date = req.user.birthday;
+			console.log(date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear());
 			next();
 		}
 	});
