@@ -40,8 +40,6 @@ function connectIO(server) {
 									{ statuscode : 404 , results : 'User were not found'});
 								} else {
 									socket.join(roomId);
-									user.room = roomId;
-									user.save();
 									socket.emit("server-join-room", 
 									{ statuscode : 200 , results : 'Join room successfully'});
 								}
@@ -69,6 +67,7 @@ function connectIO(server) {
 								{ statuscode : 404 , results : 'Room were not found'});
 						} else {
 							room.message.push(mes._id);
+							room.save();
 							io.to(roomId).emit("server-send-message",
 								{ statuscode : 200 , results : mes});
 						}
@@ -96,8 +95,6 @@ function connectIO(server) {
 									{ statuscode : 404 , results : 'Error 404'});
 								} else {
 									socket.leave(roomId);
-									user.room = '';
-									user.save();
 									socket.emit("server-leave-room", 
 									{ statuscode : 200 , results : 'Leave room successfully'});
 								}

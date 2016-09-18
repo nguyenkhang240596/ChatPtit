@@ -4,10 +4,6 @@ var crypto = require('crypto'),
     algorithm = 'aes-256-ctr';
 
 var User = new Schema({
-	room : {
-		type : Schema.Types.ObjectId,
-		ref : 'Room'
-	},
 	name : String,
 	email : {
 		type : String,
