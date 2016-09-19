@@ -57,7 +57,6 @@ router.post('/register', function(req, res, next){
 		createUser : function(callback) {
 			user = new User(req.body);
 			user.password = req.body.password;
-			user.avatar = image;
 			user.save(function(error) {
 				if (error) callback(error);
 				else callback();

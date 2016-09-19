@@ -10,7 +10,7 @@ var User = new Schema({
 		unique : true
 	},
 	phone : String,
-	avatar : String,
+	image : String,
 	background : String,
 	birthday : String,
 	gender : {
