@@ -27,9 +27,10 @@ router.get('/:messageId', function(req, res, next) {
 
 router.get('/recenlty/:roomId', function(req, res, next) {
 	Room.find({ _id : req.params.roomId })
-		.sort('-date')
-		.limit(4)
-		.populate('messages')
+		// .sort('createdDate')
+		.populate('messsages', {
+				        limit: 2
+				    })
 		.exec(function(err, messages){
 			if (err || !messages) {
 				res.json({statuscode : 404,results:'Dont have any message in room'});

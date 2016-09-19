@@ -54,7 +54,7 @@ function connectIO(server) {
 		{
 			Room.findOne({ _id : roomId }, function(err, room) {
 				if (err || !room) {
-					io.to(roomTitle).emit("server-send-message", 
+					io.to(roomId).emit("server-send-message", 
 						{ statuscode : 404 , results : 'Room were not found'});
 				} else {
 					var mes = new Message();
