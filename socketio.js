@@ -67,7 +67,15 @@ function connectIO(server) {
 								{ statuscode : 404 , results : 'Room were not found'});
 						} else {
 							room.message.push(mes._id);
-							room.save();
+							room.save(function(err) {
+								if (err) {
+									socket.emit("server-send-message", 
+									{ statuscode : 404 , results : 'User were not found'});
+								} else {
+									io.to(roomId).emit("server-send-message",
+									{ statuscode : 200 , results : mes});
+								}
+							});
 							io.to(roomId).emit("server-send-message",
 								{ statuscode : 200 , results : mes});
 						}

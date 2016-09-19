@@ -71,15 +71,15 @@ router.post('/', function(req, res, next) {
 
 router.get('/getUsersInRoom/:roomId', function(req, res, next) {
 	var room = req.room;
-	console.log(room);
-	console.log(req.params.roomId);
-	User.find({
-		room : room._id
-	}, function (err, users) {
-		if (err || !users){
-			return res.json({statuscode : 404,results : ''});
+	Room.findOne({
+		_id : room._id
+	}) 
+	.populate('members')
+	.exec(function (err, room) {
+		if (err || !room){
+			return res.json({statuscode : 404,results : 'No Users in room'});
 		} else {
-			return res.json({statuscode : 200,results : users});
+			return res.json({statuscode : 200,results : room});
 		}
 	});
 	
