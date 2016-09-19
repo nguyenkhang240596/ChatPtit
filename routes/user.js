@@ -28,8 +28,6 @@ router.post('/register', function(req, res, next){
 				return callback('password is require');
 			} else if (!phone) {
 				return callback('phone is require'); 
-			} else if (!image) {
-				return callback('image is require');
 			} else if (!name) {
 				return callback('name is require');
 			} else if (!birthday) {
