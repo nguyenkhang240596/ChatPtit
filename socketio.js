@@ -75,8 +75,6 @@ function connectIO(server) {
 									{ statuscode : 200 , results : mes});
 								}
 							});
-							io.to(roomId).emit("server-send-message",
-								{ statuscode : 200 , results : mes});
 						}
 					});
 				}
