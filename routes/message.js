@@ -6,6 +6,9 @@ var mongoose = require('mongoose');
 var MessageSchema = require('../models/message');
 var Message = mongoose.model('Message', MessageSchema);
 
+var RoomSchema = require('../models/room');
+var Room = mongoose.model('Room', RoomSchema);
+
 router.get('/:messageId', function(req, res, next) {
 	var id = req.params.messageId ? req.params.messageId.trim().toString() : '';
 	if (!id) {
@@ -23,9 +26,10 @@ router.get('/:messageId', function(req, res, next) {
 });
 
 router.get('/recenlty/:roomId', function(req, res, next) {
-	Message.find({ room : roomId })
+	Room.find({ _id : req.params.roomId })
 		.sort('-date')
 		.limit(4)
+		.populate('messages')
 		.exec(function(err, messages){
 			if (err || !messages) {
 				res.json({statuscode : 404,results:'Dont have any message in room'});
@@ -48,9 +52,17 @@ router.post('/', function(req, res, next) {
 			message = new Message(req.body);
 			message.save(function(err, data) {
 				if (err || !data) {
-					callback({results:err});
+					callback(err);
 				}else {
-					callback();
+					Room.findOne({ _id : req.body.room }, function(err2, room) {
+						if (err2 || !room) {
+							callback(err2);
+						} else {
+							room.messages.push(message);
+							room.save();
+							callback();
+						}
+					});
 				}
 			});
 		}

@@ -66,7 +66,7 @@ function connectIO(server) {
 							io.to(roomId).emit("server-send-message",
 								{ statuscode : 404 , results : 'Room were not found'});
 						} else {
-							room.message.push(mes._id);
+							room.messages.push(mes._id);
 							room.save(function(err) {
 								if (err) {
 									socket.emit("server-send-message", 
