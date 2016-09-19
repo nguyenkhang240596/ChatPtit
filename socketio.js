@@ -51,6 +51,10 @@ function connectIO(server) {
 
 		socket.on('client-send-message',function (roomId, email, content, image)
 		{
+			console.log(roomId);
+			console.log(email);
+			console.log(content);
+			console.log(image);
 			Room.findOne({ _id : roomId }, function(err, room) {
 				if (err || !room) {
 					io.to(roomId).emit("server-send-message", 
