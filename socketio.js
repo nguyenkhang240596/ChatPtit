@@ -19,7 +19,7 @@ function connectIO(server) {
 	var io = require('socket.io')(server);
 	io.sockets.on('connection',function (socket)
 	{
-		console.log('new connection');
+		console.log('new connection'); 
 		socket.on('client-join-room',function (userId, roomId)
 		{
 			Room.findOne({ _id : roomId }, function(err, room) {
@@ -51,10 +51,6 @@ function connectIO(server) {
 
 		socket.on('client-send-message',function (roomId, email, content, image)
 		{
-			console.log(roomId);
-			console.log(email);
-			console.log(content);
-			console.log(image);
 			Room.findOne({ _id : roomId }, function(err, room) {
 				if (err || !room) {
 					io.to(roomId).emit("server-send-message", 
@@ -92,22 +88,28 @@ function connectIO(server) {
 					socket.emit("server-leave-room", 
 						{ statuscode : 404 , results : 'Room were not found'});
 				} else {
-					User.findOne({ _id : userId, room : roomId }, function(err, user) {
+					User.findOne({ _id : userId }, function(err, user) {
 						if (err || !user){
 							socket.emit("server-leave-room", 
 							{ statuscode : 404 , results : 'User were not found'});
 						} else {
-							room.members.remove(room.members.indexOf(userId));
-							room.save(function(err) {
-								if (err) {
-									socket.emit("server-leave-room", 
-									{ statuscode : 404 , results : 'Error 404'});
-								} else {
-									socket.leave(roomId);
-									socket.emit("server-leave-room", 
-									{ statuscode : 200 , results : 'Leave room successfully'});
-								}
-							});
+							var pos = room.members.indexOf(user._id);
+							if (pos != -1) {
+								room.members.splice(pos, 1);
+								room.save(function(err) {
+									if (err) {
+										socket.emit("server-leave-room", 
+										{ statuscode : 404 , results : 'Error 404'});
+									} else {
+										socket.leave(roomId);
+										socket.emit("server-leave-room", 
+										{ statuscode : 200 , results : 'Leave room successfully'});
+									}
+								});
+							} else {
+								socket.emit("server-leave-room", 
+								{ statuscode : 404 , results : 'User were not found'});
+							}
 						}	
 					});
 				}
