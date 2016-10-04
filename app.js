@@ -30,6 +30,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+});
+
 app.use('/user', user);
 app.use('/message', message);
 app.use('/room', room);

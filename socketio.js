@@ -116,6 +116,12 @@ function connectIO(server) {
 			});
 		});
 
+		// test socket on web
+		socket.on('test-socket',function (msg)
+		{
+			console.log(msg);
+		    io.emit('test-socket', msg);
+		});
 
 
 	});
